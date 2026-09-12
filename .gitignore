@@ -1,0 +1,15 @@
+# Xcode and Swift build products
+.build/
+build/
+DerivedData/
+
+# Per-user Xcode state: window positions and breakpoints, not source.
+xcuserdata/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+
+.signing/
+*.p12
+*.pem
+
+.DS_Store

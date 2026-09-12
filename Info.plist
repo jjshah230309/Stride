@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Stride</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string></string>
+	</dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIUserInterfaceStyle</key>
+	<string>Automatic</string>
+
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+	</array>
+
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Stride uses your location to record the route, distance, pace and elevation of your runs and rides.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Allowing location always lets Stride keep recording your route with the screen locked and the app in your pocket. Nothing is ever sent off your phone.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Stride reads the barometer for accurate elevation and the step counter for running cadence.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Stride reads heart rate and body weight from Health so your workouts show real effort and calories.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Stride saves finished workouts, including the route, to Health so they count towards your activity rings.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Stride connects to Bluetooth heart rate straps and armbands so you can see live heart rate while you train.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Stride lets you attach photos to an activity. Photos stay on your phone.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Stride can save an activity image back to your photo library.</string>
+</dict>
+</plist>
