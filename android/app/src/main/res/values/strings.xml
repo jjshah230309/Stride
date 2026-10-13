@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stride</string>
+    <string name="recording_channel_name">Recording</string>
+    <string name="recording_channel_description">Shown while Stride is recording a run or ride.</string>
+    <string name="recording_notification_title">Stride is recording</string>
+</resources>
