@@ -1,6 +1,10 @@
 package com.jashith.stride.core
 
+import com.jashith.stride.core.model.Coord
+import com.jashith.stride.core.model.Segment
+import com.jashith.stride.core.model.SportType
 import com.jashith.stride.core.model.TrackPoint
+import java.util.UUID
 
 /** Straight tracks heading due north from a fixed start, with exactly known geometry. */
 object SyntheticTracks {
@@ -42,5 +46,14 @@ object SyntheticTracks {
             )
         }
         return out
+    }
+
+    /** A segment along the same due-north line, from [from] to [to] metres. */
+    fun segmentAlong(from: Double, to: Double, id: Int = 1, name: String = "Hill", sport: SportType = SportType.Run, starred: Boolean = true): Segment {
+        val path = (0..20).map { Coord(latAt(from + (to - from) * it / 20), START_LON) }
+        return Segment(
+            id = UUID.fromString("00000000-0000-4000-8000-%012d".format(2000 + id)), name = name, sport = sport, path = path,
+            distance = to - from, elevationGain = 0.0, averageGrade = 0.0, maxGrade = 0.0, isStarred = starred,
+        )
     }
 }
