@@ -238,3 +238,45 @@ data class DocumentsGolden(val settings: AppSettings, val activities: List<Activ
 
 /** Splits, laps and best efforts get random ids from the analysis; they carry no meaning. */
 val IGNORED_IDS = setOf("id")
+
+
+@Serializable
+data class LiveEventDTO(
+    val kind: String,
+    val name: String? = null,
+    val prTime: Double? = null,
+    val delta: Double? = null,
+    val remaining: Double? = null,
+    val time: Double? = null,
+    val isPR: Boolean? = null,
+)
+
+@Serializable
+data class LiveActiveDTO(
+    val segmentID: UUID,
+    val fraction: Double,
+    val distanceCovered: Double,
+    val elapsed: Double,
+    val deltaToPR: Double,
+    val lastAnnouncedFraction: Double,
+    val strayedSeconds: Double,
+)
+
+@Serializable
+data class LiveStep(
+    val i: Int,
+    val events: List<LiveEventDTO>,
+    val active: LiveActiveDTO? = null,
+    val nearby: List<String>? = null,
+)
+
+@Serializable
+data class LiveGolden(
+    val name: String,
+    val sport: SportType,
+    val segments: List<Segment>,
+    val bests: Map<String, Double>,
+    val trackKey: String,
+    val transform: String,
+    val steps: List<LiveStep>,
+)

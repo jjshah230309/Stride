@@ -225,6 +225,13 @@ func liveGolden(_ scenarios: [Scenario]) -> [LiveGolden] {
     out.append(runLive(name: "run-strays", sport: .run, segments: [straight], bests: bests, track: strayed, trackKey: "run", transform: "strayAfter640"))
 
     out.append(runLive(name: "ride", sport: .ride, segments: [hill, rideSeg], bests: [rideSeg.id: 60], track: ride.points, trackKey: "ride", transform: "none"))
+
+    // At cycling speed every fix moves more than 3 m, so the heading check is always applied and the
+    // reverse direction is rejected. (On foot at ~3 m/s many fixes move less than 3 m and skip the check.)
+    let rideReversed: [TrackPoint] = ride.points.reversed().enumerated().map { i, p in
+        var q = p; q.t = Double(i); return q
+    }
+    out.append(runLive(name: "ride-reversed", sport: .ride, segments: [rideSeg], bests: [rideSeg.id: 60], track: rideReversed, trackKey: "ride", transform: "reversed"))
     return out
 }
 
