@@ -6,6 +6,7 @@ import com.jashith.stride.core.model.SportType
 import com.jashith.stride.core.model.UnitSystem
 import com.jashith.stride.core.model.VoiceSettings
 import com.jashith.stride.core.util.swiftRounded
+import kotlinx.serialization.Serializable
 import java.util.Locale
 import kotlin.math.abs
 
@@ -178,6 +179,7 @@ class SpeechBuilder {
 }
 
 /** The numbers the coach reads from. Filled in by the recording session. */
+@Serializable
 data class CoachSnapshot(
     val sport: SportType = SportType.Run,
     val splitIndex: Int = 0,
