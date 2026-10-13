@@ -1,5 +1,8 @@
 package com.jashith.stride.core.io
 
+import com.jashith.stride.core.analysis.ActivityAnalyzer
+import com.jashith.stride.core.model.Activity
+import com.jashith.stride.core.model.AthleteProfile
 import com.jashith.stride.core.model.SportType
 import com.jashith.stride.core.model.TrackPoint
 import java.time.Instant
@@ -97,6 +100,13 @@ object ActivityFile {
                 )
             }
         }
+    }
+
+    /** Builds a finished activity, analysed and ready to store. */
+    fun makeActivity(imported: Imported, profile: AthleteProfile): Activity {
+        val sport = imported.sport ?: sport(imported.name) ?: SportType.Run
+        val activity = Activity(name = imported.name, sport = sport, startDate = imported.startDate)
+        return ActivityAnalyzer.analyse(activity, imported.points, profile)
     }
 
     private fun extension(filename: String): String {
