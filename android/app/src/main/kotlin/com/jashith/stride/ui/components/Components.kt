@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import com.jashith.stride.ui.theme.StrideColors
 import com.jashith.stride.ui.theme.StrideShapes
 import com.jashith.stride.ui.theme.StrideType
-import java.util.Locale
 import kotlin.math.max
 
 // Cards
@@ -94,7 +93,7 @@ fun InkCard(
 
 @Composable
 fun Kicker(text: String, modifier: Modifier = Modifier, color: Color = StrideColors.SecondaryText) {
-    Text(text.uppercase(Locale.getDefault()), modifier = modifier, style = StrideType.Kicker.copy(color = color), maxLines = 1)
+    Text(text.uppercase(androidx.compose.ui.text.intl.Locale.current.platformLocale), modifier = modifier, style = StrideType.Kicker.copy(color = color), maxLines = 1)
 }
 
 @Composable
@@ -157,7 +156,7 @@ fun StatTile(
             }
         }
         Text(
-            label.uppercase(Locale.getDefault()),
+            label.uppercase(androidx.compose.ui.text.intl.Locale.current.platformLocale),
             style = StrideType.Body.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.07.sp * 10, color = labelColor),
             maxLines = 1,
         )
