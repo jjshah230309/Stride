@@ -50,6 +50,13 @@ object FileOps {
         context.startActivity(Intent.createChooser(send, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
+    /** Writes into the app's Exports folder, replacing any earlier file of that name, and returns it. */
+    suspend fun writeExport(files: com.jashith.stride.core.store.StrideFiles, filename: String, bytes: ByteArray): File = withContext(Dispatchers.IO) {
+        files.prepare()
+        val safe = filename.replace('/', '-').replace('\\', '-')
+        File(files.exportsDirectory, safe).also { com.jashith.stride.core.store.StrideFiles.writeAtomically(it, bytes) }
+    }
+
     data class ImportOutcome(val imported: Int, val routesSkipped: Int, val failures: List<String>)
 
     /** Reads GPX, TCX and FIT files and stores each as a new activity. Bad files are reported, not fatal. */

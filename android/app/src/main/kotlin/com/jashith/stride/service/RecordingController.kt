@@ -93,6 +93,20 @@ class RecordingController(
         }
     }
 
+    /** Turns an interrupted recording into a finished one, ready for the Save screen. */
+    fun saveRecovered(snapshot: RecoverySnapshot) {
+        val base = Activity(
+            id = snapshot.activityID,
+            name = Activity.defaultName(snapshot.sport, snapshot.startDate),
+            sport = snapshot.sport,
+            startDate = snapshot.startDate,
+            laps = snapshot.laps,
+        )
+        val analysed = com.jashith.stride.core.analysis.ActivityAnalyzer.analyse(base, snapshot.points, store.current.settings.profile)
+        _finished.value = FinishedRecording(analysed, snapshot.points)
+        dismissRecovery()
+    }
+
     fun dismissRecovery() {
         _recovery.value = null
         scope.launch(Dispatchers.IO) { store.files.clearRecovery() }

@@ -23,3 +23,6 @@ fun <T> rememberStoreState(select: (StoreState) -> T): T {
     val state = rememberStoreState()
     return remember(state) { select(state) }
 }
+
+/** Shows a short message at the bottom of the screen. */
+val LocalMessage = compositionLocalOf<(String) -> Unit> { {} }
