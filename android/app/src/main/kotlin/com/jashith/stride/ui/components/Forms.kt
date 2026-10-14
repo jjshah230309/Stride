@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -306,4 +307,48 @@ fun NotesField(value: String, onChange: (String) -> Unit, placeholder: String, m
             }
         },
     )
+}
+
+/** A row that opens another screen: icon, title, chevron. */
+@Composable
+fun NavRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, onClick: () -> Unit, divider: Boolean = true, subtitle: String? = null) {
+    FormRow(onClick = onClick, divider = divider) {
+        Icon(icon, null, tint = StrideColors.Green, modifier = Modifier.width(22.dp))
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(title, style = StrideType.Body.copy(fontSize = 15.sp))
+            if (subtitle != null) Text(subtitle, style = StrideType.Footnote)
+        }
+        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = StrideColors.TertiaryText)
+    }
+}
+
+/** A tappable text row such as "Scan for monitors". */
+@Composable
+fun ButtonRow(title: String, onClick: () -> Unit, destructive: Boolean = false, enabled: Boolean = true, divider: Boolean = true) {
+    FormRow(onClick = if (enabled) onClick else null, divider = divider) {
+        Text(
+            title,
+            style = StrideType.Body.copy(
+                fontSize = 15.sp,
+                color = when {
+                    !enabled -> StrideColors.TertiaryText
+                    destructive -> StrideColors.Negative
+                    else -> StrideColors.Green
+                },
+                fontWeight = FontWeight.Medium,
+            ),
+        )
+    }
+}
+
+/** A label with a coloured dot, used for the zone lists. */
+@Composable
+fun ZoneRow(color: Color, title: String, range: String, divider: Boolean = true) {
+    FormRow(divider = divider) {
+        Box(Modifier.width(8.dp).padding(vertical = 4.dp).background(color, CircleShape).padding(4.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(title, Modifier.weight(1f), style = StrideType.Body.copy(fontSize = 13.sp))
+        Text(range, style = StrideType.Body.copy(fontSize = 12.sp, color = StrideColors.SecondaryText))
+    }
 }
