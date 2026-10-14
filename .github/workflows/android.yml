@@ -63,6 +63,84 @@ jobs:
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: ignore
 
+  # Builds a signed release APK and publishes it. Needs the four repository secrets from
+  # Tools/android-make-keystore.sh; without them the job explains what is missing and stops.
+  release:
+    name: Signed release APK
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: android
+    env:
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      STRIDE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      STRIDE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      STRIDE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      STRIDE_VERSION_CODE: ${{ github.run_number }}
+      STRIDE_VERSION_NAME: 1.0.${{ github.run_number }}
+    steps:
+      - name: Check for signing secrets
+        id: gate
+        working-directory: .
+        run: |
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$STRIDE_KEYSTORE_PASSWORD" ] || [ -z "$STRIDE_KEY_ALIAS" ] || [ -z "$STRIDE_KEY_PASSWORD" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Signing secrets are not set, so no APK is published. Run Tools/android-make-keystore.sh and add the four secrets it prints."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.enabled == 'true'
+
+      - uses: actions/setup-java@v4
+        if: steps.gate.outputs.enabled == 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.gate.outputs.enabled == 'true'
+
+      - name: Android SDK
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;37.0.0"
+
+      - name: Build and sign
+        if: steps.gate.outputs.enabled == 'true'
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/stride.jks"
+          STRIDE_KEYSTORE_PATH="$RUNNER_TEMP/stride.jks" ./gradlew :app:assembleRelease --stacktrace
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs "$APK"
+          cp "$APK" "$RUNNER_TEMP/Stride-${STRIDE_VERSION_NAME}.apk"
+          cp "$APK" "$RUNNER_TEMP/Stride.apk"
+          rm -f "$RUNNER_TEMP/stride.jks"
+
+      - name: Publish releases
+        if: steps.gate.outputs.enabled == 'true'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="android-v${STRIDE_VERSION_NAME}"
+          gh release create "$TAG" "$RUNNER_TEMP/Stride-${STRIDE_VERSION_NAME}.apk" \
+            --title "Stride for Android ${STRIDE_VERSION_NAME}" \
+            --notes "Signed build ${STRIDE_VERSION_NAME}. Install it by opening the file on your phone. Updates install over the top and keep your data, as long as they are signed with the same key." \
+            --target "$GITHUB_SHA"
+          # A rolling release that always holds the newest APK, so there is one stable download link.
+          gh release delete android-latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create android-latest "$RUNNER_TEMP/Stride.apk" \
+            --title "Stride for Android (latest)" \
+            --notes "Always the newest signed build: ${STRIDE_VERSION_NAME}." \
+            --target "$GITHUB_SHA"
+
   # The goldens are produced by the real iOS code. If the iOS behaviour changes, regenerating them changes
   # the files, and this job fails until the Kotlin port has been updated to match.
   reference-drift:

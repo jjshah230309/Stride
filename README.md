@@ -12,6 +12,9 @@ leaning capsules, deep green on lime. It ships in all three iOS appearances —
 light, dark and tinted — and is regenerated from the palette by
 `Tools/make-icon.py`, so changing a colour there and re-running is all it takes.
 
+Stride also runs on Android. See [Stride for Android](#stride-for-android) below;
+the two apps read and write the same backup file, so your data moves between them.
+
 ---
 
 ## Installing it on your iPhone without a paid developer account
@@ -370,3 +373,109 @@ Also worth being honest about: power on rides without a power meter is a physics
 estimate, not a measurement, and calories and Relative Effort are models. Treat
 them as consistent trends rather than absolute truth. That is equally true of
 Strava's versions.
+
+
+---
+
+## Stride for Android
+
+A native Kotlin and Jetpack Compose port in [`android/`](android/), with the same
+tabs, the same palette and the same features: GPS recording with spoken splits,
+live segments, the training log, routes, gear, goals, GPX/TCX/FIT import and
+export, and backups. The iPhone app is untouched.
+
+> **Not yet tested on a phone.** It was written and built without access to an
+> Android device or emulator. What is verified: the whole data and analysis layer
+> (about 260 unit tests, including comparisons against output from the real iOS
+> code), the build, and lint. What is not: GPS and the foreground service on real
+> hardware, Bluetooth straps, text-to-speech, Health Connect and the map screens.
+> Expect rough edges on first use, and please report them.
+
+### Installing
+
+1. Open this repository's **Releases** page on your phone and download
+   **Stride for Android (latest)**, `Stride.apk`.
+2. Open the file. Android asks to allow installs from your browser or file
+   manager; allow it for this one install.
+3. Open Stride and follow the short setup.
+
+Updates install over the top and keep your data, as long as they are signed with
+the same key (see below).
+
+### Permissions
+
+| Permission | Why |
+|---|---|
+| Location | Records the route, distance, pace and elevation. Only used while a recording is running or the Record screen is open. |
+| Notifications | The ongoing "recording" notification, with a Pause button. Recording still works if you decline. |
+| Physical activity | Counts steps for running cadence. Optional. |
+| Nearby devices (Bluetooth) | Finds and reads a heart rate strap. Optional. |
+| Health Connect | Reads heart rate and weight, writes finished workouts and their route. Optional. |
+
+There is no background-location permission. Recording keeps going with the screen
+off because it runs as a foreground service, shown by the notification.
+
+**Battery saver.** Some phones (Xiaomi, Huawei, OnePlus, Samsung's "sleeping
+apps") stop apps in the background even when they are recording. If long
+recordings stop, set Stride to *Unrestricted* battery use; the Record screen has
+a shortcut. If it is killed anyway, Stride finds the unfinished recording next
+time you open it and offers to resume or save it.
+
+### Moving between iPhone and Android
+
+Use **You → Data → Back up now**. The `.stridebackup` file is the same on both
+platforms: it carries every activity with its GPS track, plus segments, routes,
+gear, goals and settings. Send it to the other phone and use **Restore from a
+backup** (merge keeps what is already there, replace swaps it).
+
+Heart rate settings keep their iOS names inside the file; on Android "Apple
+Health" means Health Connect.
+
+### Maps and the network
+
+Recording, analysis and storage work offline. The only network requests are map
+tiles from [OpenFreeMap](https://openfreemap.org) (OpenStreetMap data, no key)
+and, in the route builder, path snapping through the public OpenStreetMap
+routing servers. Offline, maps show your route on a plain background and the
+builder joins points with straight lines. Satellite imagery is not offered.
+
+### Differences from the iPhone app
+
+- Heart rate from a watch arrives through Health Connect, which has no live
+  feed. Stride polls it about every ten seconds; a Bluetooth strap is live.
+- Maps are OpenStreetMap, not Apple Maps, and lists show a drawn route outline
+  rather than a map.
+- Spoken splits use Android's text-to-speech engine and voices. Pauses between
+  phrases are inserted as short silences instead of SSML.
+- Automatic backups live in the app's private folder; open **Saved backups** to
+  share one or save a copy elsewhere.
+
+### Getting a signed build from your own fork
+
+The repository is public, so the signing key must not be committed. It lives in
+GitHub secrets instead:
+
+1. Run `Tools/android-make-keystore.sh`. It creates a key in `.signing/`
+   (git-ignored) and prints four values.
+2. Add them as repository secrets: `ANDROID_KEYSTORE_BASE64`,
+   `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+3. Push to `main` (or run the *Android* workflow). It tests, builds, signs and
+   publishes the APK as `android-latest` plus a versioned release.
+
+**Keep a copy of the keystore and its password.** Without the same key, a newer
+build cannot be installed over an older one; you would have to uninstall first,
+which erases the app's data (take a backup first). Without the secrets, the
+workflow still builds and tests but publishes nothing.
+
+### Building it yourself
+
+```sh
+cd android
+./gradlew :core:test            # data layer, analysis, parity tests
+./gradlew :app:assembleDebug    # app/build/outputs/apk/debug
+```
+
+Needs JDK 21 and the Android SDK (platform 37). `Tools/swift-reference/`
+compiles the iOS source on Linux to produce the reference output the Kotlin tests
+compare against; CI re-generates it and fails if the iOS behaviour has drifted
+from the port.
