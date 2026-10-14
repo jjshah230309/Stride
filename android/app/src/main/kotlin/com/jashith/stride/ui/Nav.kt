@@ -14,8 +14,8 @@ sealed interface Dest {
     data class RouteDetail(val id: UUID) : Dest
     data class SegmentCreator(val activityId: UUID) : Dest
     data class RouteBuilder(val seedRouteId: UUID? = null) : Dest
-    data object Heatmap : Dest
     data object Profile : Dest
+    data object AthleteProfile : Dest
     data object Gear : Dest
     data object HeartRateMonitor : Dest
     data object Data : Dest

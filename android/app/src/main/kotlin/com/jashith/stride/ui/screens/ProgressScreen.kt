@@ -442,7 +442,7 @@ fun GoalProgressRow(goal: Goal, activities: List<Activity>, units: UnitSystem, c
     val zone = ZoneId.systemDefault()
     val now = Instant.now()
     val today = now.atZone(zone).toLocalDate()
-    val first = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek
+    val first = remember { deviceFirstDayOfWeek() }
     val start = when (goal.period) {
         GoalPeriod.Weekly -> today.with(TemporalAdjusters.previousOrSame(first))
         GoalPeriod.Monthly -> today.withDayOfMonth(1)
@@ -638,3 +638,6 @@ private fun RacePredictionCard(efforts: List<BestEffort>) {
         }
     }
 }
+
+/** Read outside composition: it only changes if the user changes the device locale, which restarts the activity anyway. */
+private fun deviceFirstDayOfWeek(): DayOfWeek = java.time.temporal.WeekFields.of(java.util.Locale.getDefault()).firstDayOfWeek
